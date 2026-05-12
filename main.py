@@ -1,11 +1,13 @@
 import asyncio
+import os
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
 
-TOKEN = "8352637347:AAE3hICTFuCIrRnud2LKkqMcE79tgLVFpRg"
 
+# 🔑 Токен берётся из Railway (или другого сервера)
+TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -32,12 +34,10 @@ async def find(message: Message):
 
     uid = message.from_user.id
 
-    # уже в чате
     if uid in active_chats:
         await message.answer("❌ ты уже в чате. /stop чтобы выйти")
         return
 
-    # если есть кто-то в очереди → матч
     if waiting_users:
 
         partner = waiting_users.pop(0)
@@ -59,7 +59,6 @@ async def stop(message: Message):
 
     uid = message.from_user.id
 
-    # выйти из чата
     if uid in active_chats:
 
         partner = active_chats.pop(uid)
@@ -70,7 +69,6 @@ async def stop(message: Message):
 
         return
 
-    # выйти из очереди
     if uid in waiting_users:
         waiting_users.remove(uid)
         await message.answer("❌ поиск остановлен")
@@ -101,5 +99,5 @@ async def main():
     await dp.start_polling(bot)
 
 
-if name == "main":
+if __name__ == "__main__":
     asyncio.run(main())
